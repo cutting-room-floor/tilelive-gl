@@ -1,0 +1,24 @@
+{
+  "name": "tilelive-gl",
+  "version": "0.0.1",
+  "main": "./index.js",
+  "description": "tilelive API for node-mapbox-gl-native",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mapbox/tilelive-gl.git"
+  },
+  "licenses": "BSD",
+  "dependencies": {
+    "mapbox-gl-native": "https://github.com/mapbox/node-mapbox-gl-native/tarball/async-concurrent",
+    "sphericalmercator": "~1.0.2"
+  },
+  "devDependencies": {
+    "tape": "2.13.x"
+  },
+  "scripts": {
+    "test": "tape test/*.js"
+  },
+  "engines": {
+    "node": "0.10.x"
+  }
+}
