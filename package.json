@@ -10,7 +10,7 @@
   "licenses": "BSD",
   "dependencies": {
     "generic-pool": "^2.1.1",
-    "mapbox-gl-native": "mapbox/node-mapbox-gl-native",
+    "mapbox-gl-native": "https://github.com/mapbox/node-mapbox-gl-native/tarball/access-token",
     "sphericalmercator": "^1.0.2"
   },
   "devDependencies": {

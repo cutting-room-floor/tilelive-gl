@@ -10,7 +10,8 @@ module.exports = GL;
 function GL(uri, callback) {
     if (typeof uri !== 'object' || !uri) return callback(new Error('uri must be an object'));
     if (typeof uri.style !== 'object') return callback(new Error('uri.style must be a GL style object'));
-    this._pool = pool(uri.style);
+    this._style = uri.style;
+    this._pool = pool(this._style);
     return callback(null, this);
 }
 
@@ -23,11 +24,8 @@ function pool(style) {
 
     function create(callback) {
         var map = new mbgl.Map();
-        map.load(style, loaded);
-        function loaded(err, buffer) {
-            if (err) return callback(err);
-            return callback(null, map);
-        }
+        map.load(style);
+        return callback(null, map);
     }
 
     function destroy(map) {
@@ -36,8 +34,7 @@ function pool(style) {
 }
 
 GL.prototype.getTile = function(z, x, y, callback) {
-    if (!process.env.MapboxAccessToken) return callback(new Error('MapboxAccessToken env var required'));
-    process.env.MAPBOX_ACCESS_TOKEN = process.env.MapboxAccessToken;
+    if (!process.env.MAPBOX_ACCESS_TOKEN) return callback(new Error('MAPBOX_ACCESS_TOKEN env var required'));
 
     var bbox = sm.bbox(+x,+y,+z, false, 'WGS84');
     var options = {
@@ -45,10 +42,8 @@ GL.prototype.getTile = function(z, x, y, callback) {
         width: 512,
         height: 512,
         zoom: z,
-        accessToken: process.env.MapboxAccessToken
+        accessToken: process.env.MAPBOX_ACCESS_TOKEN
     };
-
-    console.log(options);
 
     this._pool.acquire(function(err, map) {
         if (err) return callback(err);
@@ -57,7 +52,6 @@ GL.prototype.getTile = function(z, x, y, callback) {
             if (err) return callback(err);
             this._pool.release(map);
             return callback(null, buffer, { 'Content-Type': 'image/png' });
-        });
-    });
+        }.bind(this));
+    }.bind(this));
 };
-
