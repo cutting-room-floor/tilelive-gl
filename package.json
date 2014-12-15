@@ -9,14 +9,17 @@
   },
   "licenses": "BSD",
   "dependencies": {
-    "mapbox-gl-native": "https://github.com/mapbox/node-mapbox-gl-native/tarball/master",
-    "sphericalmercator": "~1.0.2"
+    "generic-pool": "^2.1.1",
+    "mapbox-gl-native": "https://github.com/mapbox/node-mapbox-gl-native/tarball/cli-render",
+    "sphericalmercator": "^1.0.2"
   },
   "devDependencies": {
-    "tape": "2.13.x"
+    "mapbox-gl-styles": "https://github.com/mapbox/mapbox-gl-styles/tarball/mb-pages",
+    "st": "^0.5.2",
+    "tape": "^3.0.3"
   },
   "scripts": {
-    "test": "tape test/*.js"
+    "test": "tape test/**/*.test.js && ./test/compare.js"
   },
   "engines": {
     "node": "0.10.x"
