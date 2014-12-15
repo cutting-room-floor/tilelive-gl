@@ -1,10 +1,26 @@
+'use strict';
+
+/* jshint node:true */
+
 var GL = require('../index.js');
+var test = require('tape').test;
 var fs = require('fs');
-var tape = require('tape');
-var testStyle = require('./style.json');
+var path = require('path');
+var http = require('http');
+var st = require('st');
+var mkdirp = require('mkdirp');
+
+var dirPath = path.join(path.dirname(require.resolve('mapbox-gl-styles/package.json')), 'styles');
+var server = http.createServer(st({ path: dirPath }));
+
+function startFixtureServer(callback) {
+    server.listen(0, function(err) {
+        callback(err, err ? null : server.address().port);
+    });
+}
 
 // These calls are all effectively synchronous though they use a callback.
-tape('init', function(t) {
+test('api', function(t) {
     new GL(null, function(err) {
         t.equal(err.toString(), 'Error: uri must be an object');
     });
@@ -15,24 +31,40 @@ tape('init', function(t) {
     new GL({}, function(err) {
         t.equal(err.toString(), 'Error: uri.style must be a GL style object');
     });
-    new GL({ style: testStyle }, function(err, source) {
+    new GL({ style: {} }, function(err, source) {
         t.ifError(err);
         t.equal(source instanceof GL, true, 'GL source');
-        t.deepEqual(source._style, testStyle, 'GL source._style');
     });
     t.end();
 });
 
-tape('getTile', function(t) {
-    new GL({ style: testStyle }, function(err, source) {
-        t.ifError(err);
-        source.getTile(0, 0, 0, function(err, image) {
+function renderTest(name, stylePath) {
+    return function(t) {
+        var style = require(stylePath);
+        new GL({ style: style }, function(err, source) {
             t.ifError(err);
-            if (process.env.UPDATE) {
-                fs.writeFileSync(__dirname + '/expected/output.png', image);
-            }
-            t.end();
+            t.deepEqual(source._style, style, 'GL source._style');
+            source.getTile(0, 0, 0, function(err, image) {
+                t.ifError(err);
+                var dir = __dirname + '/' + (process.env.UPDATE ? 'expected' : 'actual') + '/';
+                mkdirp(dir);
+                fs.writeFileSync(dir + name + '.png', image);
+                t.end();
+            });
         });
+    }
+}
+
+startFixtureServer(function(err, port) {
+    if (err) throw err;
+
+    fs.readdirSync(dirPath).forEach(function(style) {
+        var name = style.split('.json')[0];
+        test(name, renderTest(name, path.join(dirPath, style)));
+    });
+
+    test('cleanup', function(t) {
+        server.close();
+        t.end();
     });
 });
-
