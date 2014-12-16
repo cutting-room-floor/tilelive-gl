@@ -7,7 +7,7 @@ Renderer backend for [tilelive.js](http://github.com/mapbox/tilelive.js) that us
 
 ## Installation
 
-First, [install](https://github.com/mapbox/mapbox-gl-native/tree/cli-render-disable-assert#build-instructions) the [`cli-render-disable-assert`](https://github.com/mapbox/mapbox-gl-native/tree/cli-render-disable-assert) branch of mapbox-gl-native and [set an access token](https://github.com/mapbox/mapbox-gl-native/tree/cli-render-disable-assert#mapbox-api-access-tokens).
+First, [install](https://github.com/mapbox/mapbox-gl-native/tree/cli-render-disable-assert#build-instructions) the [`cli-render-disable-assert`](https://github.com/mapbox/mapbox-gl-native/tree/cli-render-disable-assert) branch of `mapbox-gl-native` and [set an access token](https://github.com/mapbox/mapbox-gl-native/tree/cli-render-disable-assert#mapbox-api-access-tokens).
 
 Next, install the [`cli-render`](https://github.com/mapbox/node-mapbox-gl-native/tree/cli-render) branch of `node-mapbox-gl-native` and finally `npm install mapbox/tilelive-gl`.
 
