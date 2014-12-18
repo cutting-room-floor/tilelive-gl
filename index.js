@@ -29,7 +29,7 @@ function pool(style) {
     }
 
     function destroy(map) {
-        delete map;
+        map.terminate();
     }
 }
 
