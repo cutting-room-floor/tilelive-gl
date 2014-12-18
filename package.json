@@ -15,6 +15,7 @@
   },
   "devDependencies": {
     "mapbox-gl-styles": "git+ssh://git@github.com:mapbox/mapbox-gl-styles.git#mb-pages",
+    "mkdirp": "^0.5.0",
     "st": "^0.5.2",
     "tape": "^3.0.3"
   },
