@@ -10,7 +10,8 @@
   "licenses": "BSD",
   "dependencies": {
     "generic-pool": "^2.1.1",
-    "mapbox-gl-native": "https://mapbox-npm.s3.amazonaws.com/package/mapbox-gl-native-0.0.1-e5e6cee6f427af500a5b6f734d64bdadc993ccf2.tgz",
+    "mapbox-gl-native": "^1.0.0",
+    "request": "^2.53.0",
     "sphericalmercator": "^1.0.2"
   },
   "devDependencies": {
