@@ -19,21 +19,23 @@ function startFixtureServer(callback) {
     });
 }
 
-function renderTest(name, stylePath) {
+function renderTest(name, z, x, y, scale, stylePath) {
     return function(t) {
         var style = require(stylePath);
         new GL({ style: style }, function(err, source) {
             t.error(err);
             t.deepEqual(source._style, style, 'GL source._style');
-            source.getTile(0, 0, 0, function(err, image) {
+            var cbTile = function(err, image) {
                 t.error(err);
                 var dir = __dirname + '/fixtures/' + name + '/';
                 mkdirp(dir, function(err) {
                     t.error(err);
-                    fs.writeFileSync(dir + (process.env.UPDATE ? 'expected' : 'actual') + '.png', image);
+                    fs.writeFileSync(dir + (process.env.UPDATE ? 'expected-' : 'actual') + '-' + z + '-' + x + '-' + y + (scale ? '@2x' : '') + '.png', image);
                     t.end();
                 });
-            });
+            };
+            if (scale) cbTile.scale = scale;
+            source.getTile(z, x, y, cbTile);
         });
     }
 }
@@ -43,7 +45,14 @@ startFixtureServer(function(err, port) {
 
     fs.readdirSync(dirPath).forEach(function(style) {
         var name = style.split('.json')[0];
-        test(name, renderTest(name, path.join(dirPath, style)));
+        var tiles = ['0.0.0', '1.0.1', '2.1.1', '3.2.3', '4.4.6', '4.4.6.2'];
+        tiles.forEach(function(tile) {
+            var z = tile.split('.')[0] || 0;
+            var x = tile.split('.')[1] || 0;
+            var y = tile.split('.')[2] || 0;
+            var scale = tile.split('.')[3] || null;
+            test(name, renderTest(name, z, x, y, scale, path.join(dirPath, style)));
+        });
     });
 
     test('cleanup', function(t) {
