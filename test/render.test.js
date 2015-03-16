@@ -30,7 +30,7 @@ function renderTest(name, z, x, y, scale, stylePath) {
                 var dir = __dirname + '/fixtures/' + name + '/';
                 mkdirp(dir, function(err) {
                     t.error(err);
-                    fs.writeFileSync(dir + (process.env.UPDATE ? 'expected-' : 'actual') + '-' + z + '-' + x + '-' + y + (scale ? '@2x' : '') + '.png', image);
+                    fs.writeFileSync(dir + (process.env.UPDATE ? 'expected-' : 'actual-') + z + '-' + x + '-' + y + (scale ? '@2x' : '') + '.png', image);
                     t.end();
                 });
             };
@@ -45,7 +45,7 @@ startFixtureServer(function(err, port) {
 
     fs.readdirSync(dirPath).forEach(function(style) {
         var name = style.split('.json')[0];
-        var tiles = ['0.0.0', '1.0.1', '2.1.1', '3.2.3', '4.4.6', '4.4.6.2'];
+        var tiles = ['0.0.0', '1.0.1', '2.1.1', '3.2.3', '4.4.6', '4.4.6',  '4.4.6.2'];
         tiles.forEach(function(tile) {
             var z = tile.split('.')[0] || 0;
             var x = tile.split('.')[1] || 0;
