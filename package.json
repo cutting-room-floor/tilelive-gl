@@ -15,14 +15,12 @@
     "sphericalmercator": "^1.0.2"
   },
   "devDependencies": {
-    "mapbox-gl-styles": "git+ssh://git@github.com:mapbox/mapbox-gl-styles.git#mb-pages",
-    "recursive-readdir": "^1.2.1",
     "mkdirp": "^0.5.0",
     "st": "^0.5.2",
     "tape": "^3.0.3"
   },
   "scripts": {
-    "test": "tape test/**/*.test.js && ./test/compare.js"
+    "test": "tape test/*.test.js"
   },
   "engines": {
     "node": "0.10.x"

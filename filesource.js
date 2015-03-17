@@ -11,7 +11,6 @@ fileSource.request = function(req) {
         if (req.canceled) {
             return;
         }
-
         if (err) {
             req.respond(err);
         } else if (res.statusCode == 200) {
