@@ -1,3 +1,5 @@
 test/fixtures/**/actual.png
 test/fixtures/**/diff.png
+test/fixtures/actual
+test/fixtures/diff
 test/fixtures/index.html
