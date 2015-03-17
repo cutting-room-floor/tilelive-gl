@@ -1,0 +1,33 @@
+{
+    "version": 7,
+    "name": "Basic",
+    "sources": {
+        "mapbox": {
+          "type": "vector",
+          "url": "mapbox://mapbox.mapbox-streets-v6"
+        }
+    },
+    "layers": [{
+        "id": "background",
+        "type": "background",
+        "paint": {
+            "background-color": "yellow"
+        }
+    }, {
+        "id": "water",
+        "type": "fill",
+        "source": "mapbox",
+        "source-layer": "water",
+        "paint": {
+            "fill-color": "magenta"
+        }
+    }, {
+        "id": "admin_country",
+        "type": "line",
+        "source": "mapbox",
+        "source-layer": "admin",
+        "paint": {
+          "line-color": "cyan"
+        }
+    }]
+}
