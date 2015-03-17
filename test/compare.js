@@ -30,6 +30,7 @@ var failures = 0;
 // Get expected, use that to find actuals and diffs
 function processFiles() {
     recursive(path.join(dirPath, 'expected'), function(err, files) {
+
         files.forEach(function(file) {
             var filename = file.split('expected/').pop();
 
@@ -56,11 +57,9 @@ function processFiles() {
                         writeResult(actual, expected, diff, match ? '' : error, difference);
 
                     }
-                    processFiles();
                 });
                 compare.stdin.end();
             }
-
             processFileTest();
         });
     });
