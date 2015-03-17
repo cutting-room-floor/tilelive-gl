@@ -4,8 +4,9 @@ node_js:
 - "0.10"
 
 env:
-- LD_LIBRARY_PATH: "/usr/local/lib"
-- MESA_VERSION: 10.4.3
+  global:
+  - LD_LIBRARY_PATH: "/usr/local/lib"
+  - MESA_VERSION: 10.4.3
 
 before_install:
 - source ./scripts/setup_mesa.sh
