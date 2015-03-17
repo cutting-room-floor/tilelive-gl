@@ -27,14 +27,14 @@ function renderTest(name, z, x, y, scale, stylePath) {
             t.deepEqual(source._style, style, 'GL source._style');
             var cbTile = function(err, image) {
                 t.error(err);
-                var dir = __dirname + '/fixtures/' + name + '/';
+                var dir = __dirname + '/fixtures/' + (process.env.UPDATE ? 'expected/' : 'actual/') + name + '/';
                 mkdirp(dir, function(err) {
                     t.error(err);
-                    fs.writeFileSync(dir + (process.env.UPDATE ? 'expected-' : 'actual-') + z + '-' + x + '-' + y + (scale ? '@2x' : '') + '.png', image);
+                    fs.writeFileSync(dir + z + '-' + x + '-' + y + '@' + scale + 'x' + '.png', image);
                     t.end();
                 });
             };
-            if (scale) cbTile.scale = scale;
+            cbTile.scale = scale;
             source.getTile(z, x, y, cbTile);
         });
     }
@@ -45,13 +45,15 @@ startFixtureServer(function(err, port) {
 
     fs.readdirSync(dirPath).forEach(function(style) {
         var name = style.split('.json')[0];
-        var tiles = ['0.0.0', '1.0.1', '2.1.1', '3.2.3', '4.4.6', '4.4.6',  '4.4.6.2'];
+        var tiles = ['0.0.0', '1.0.1', '2.1.1', '3.2.3', '4.4.6', '4.4.6'];
         tiles.forEach(function(tile) {
             var z = tile.split('.')[0] || 0;
             var x = tile.split('.')[1] || 0;
             var y = tile.split('.')[2] || 0;
-            var scale = tile.split('.')[3] || null;
-            test(name, renderTest(name, z, x, y, scale, path.join(dirPath, style)));
+            // 1x
+            test(name, renderTest(name, z, x, y, 1, path.join(dirPath, style)));
+            // 2x
+            test(name, renderTest(name, z, x, y, 2, path.join(dirPath, style)));
         });
     });
 
