@@ -49,7 +49,7 @@ GL.prototype.getTile = function(z, x, y, callback) {
 
     var bbox = sm.bbox(+x,+y,+z, false, 'WGS84');
     var options = {
-        center: [bbox[0] + ((bbox[2] - bbox[0]) * 0.5), bbox[1] + ((bbox[3] - bbox[1]) * 0.5)],
+        center: [bbox[1] + ((bbox[3] - bbox[1]) * 0.5), bbox[0] + ((bbox[2] - bbox[0]) * 0.5)],
         width: 512,
         height: 512,
         ratio: scale || 1,
