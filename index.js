@@ -1,28 +1,34 @@
 var sm = new (require('sphericalmercator'))();
 var fs = require('fs');
 var mbgl = require('mapbox-gl-native');
-var fileSource = require('./filesource');
 
 var Pool = require('generic-pool').Pool;
 var N_CPUS = require('os').cpus().length;
 
 module.exports = GL;
 
+mbgl.on('message', function(msg) {
+    console.log(msg.severity, '[' + msg.class + ']', msg.text);
+});
+
 function GL(options, callback) {
     if (typeof options !== 'object' || !options) return callback(new Error('options must be an object'));
+
+    if (!(options.source instanceof mbgl.FileSource)) return callback(new Error('options.source must be a FileSource object'));
+    if (typeof options.source.request !== 'function') return callback(new Error("options.source must have a 'request' method"));
+    if (typeof options.source.cancel !== 'function') return callback(new Error("options.source must have a 'cancel' method"));
 
     if (typeof options.style !== 'object') return callback(new Error('options.style must be a GL style object'));
     this._style = options.style;
 
-    if (typeof options.accessToken != 'string' && !process.env.MAPBOX_ACCESS_TOKEN) return callback(new Error('options.accessToken string or MAPBOX_ACCESS_TOKEN environment variable required'));
     this._accessToken = options.accessToken || process.env.MAPBOX_ACCESS_TOKEN;
 
-    this._pool = pool(this._style, this._accessToken);
+    this._pool = pool(options.source, this._style, this._accessToken);
 
     return callback(null, this);
 }
 
-function pool(style, accessToken) {
+function pool(source, style, accessToken) {
     return Pool({
         create: create,
         destroy: destroy,
@@ -30,8 +36,8 @@ function pool(style, accessToken) {
     });
 
     function create(callback) {
-        var map = new mbgl.Map(fileSource);
-        map.setAccessToken(accessToken)
+        var map = new mbgl.Map(source);
+        if (accessToken) map.setAccessToken(accessToken)
         map.load(style);
         return callback(null, map);
     }

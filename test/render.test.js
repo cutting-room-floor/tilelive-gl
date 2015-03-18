@@ -9,11 +9,10 @@ var path = require('path');
 var http = require('http');
 var st = require('st');
 var mkdirp = require('mkdirp');
-var tilesPath = path.join(__dirname, 'fixtures', 'tiles');
 var compare = require('./compare.js')
+var tiles = path.join('test', 'fixtures', 'tiles');
+var source = require('./fixtures/filesource/fs');
 var style = require('./fixtures/style.json');
-
-var server = http.createServer(st({ path: __dirname }));
 
 function filePath(name) {
     return ['expected', 'actual', 'diff'].reduce(function(prev, key) {
@@ -24,20 +23,14 @@ function filePath(name) {
     }, {});
 }
 
-function startFixtureServer(callback) {
-    server.listen(8000, function(err) {
-        callback(err, err ? null : server.address().port);
-    });
-}
-
-function renderTest(name, z, x, y, scale, style) {
+function renderTest(tile, style, scale) {
     return function(t) {
-        new GL({ style: style }, function(err, source) {
+        new GL({ source: source, style: style }, function(err, source) {
             t.error(err);
-            t.deepEqual(source._style, style, 'GL source._style');
-            var cbTile = function(err, image) {
+
+            var callback = function(err, image) {
                 t.error(err);
-                var filename = filePath(name + '@' + scale + 'x' + '.png');
+                var filename = filePath(tile.join('-') + (scale ? '@' + scale + 'x' : '') + '.png');
                 if (process.env.UPDATE) {
                     fs.writeFile(filename.expected, image, function(err) {
                         t.error(err);
@@ -51,27 +44,24 @@ function renderTest(name, z, x, y, scale, style) {
                         });
                     });
                 }
-            };
-            cbTile.scale = scale;
-            source.getTile(z, x, y, cbTile);
+            }
+
+            if (scale) callback.scale = scale;
+
+            var z = tile[0];
+            var x = tile[1];
+            var y = tile[2];
+
+            source.getTile(z, x, y, callback);
         });
     }
 }
 
-startFixtureServer(function(err, port) {
-    if (err) throw err;
-    fs.readdirSync(tilesPath).forEach(function(tile, i) {
-        var name = tile.split('.vector')[0];
-        var z = tile.split('-')[0] || 0;
-        var x = tile.split('-')[1] || 0;
-        var y = tile.split('-')[2][0] || 0;
-        // 1x
-        test(name + '@1x', renderTest(name, z, x, y, 1, style));
-        // 2x
-        test.skip(name + '@2x', renderTest(name, z, x, y, 2, style));
+test('Render', function(t) {
+    fs.readdirSync(tiles).forEach(function(filename) {
+        var tile = filename.split('.')[0].split('-');
+        t.test(tile.join('-'), renderTest(tile, style));
+        t.skip(tile.join('-') + '@2x', renderTest(tile, style, 2));
     });
-    test('cleanup', function(t) {
-        server.close();
-        t.end();
-    });
+    t.end();
 });

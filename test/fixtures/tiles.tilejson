@@ -9,5 +9,5 @@
     "name": "Mapbox Streets V6",
     "scheme": "xyz",
     "tilejson": "2.0.0",
-    "tiles": [ "http://localhost:8000/fixtures/tiles/{z}-{x}-{y}.vector.pbf" ]
+    "tiles": [ "./fixtures/tiles/{z}-{x}-{y}.vector.pbf" ]
 }

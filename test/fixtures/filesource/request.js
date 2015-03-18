@@ -1,3 +1,7 @@
+'use strict';
+
+/* jshint node:true */
+
 var mbgl = require('mapbox-gl-native');
 var request = require('request');
 
