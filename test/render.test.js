@@ -61,7 +61,7 @@ test('Render', function(t) {
     fs.readdirSync(tiles).forEach(function(filename) {
         var tile = filename.split('.')[0].split('-');
         t.test(tile.join('-'), renderTest(tile, style));
-        t.skip(tile.join('-') + '@2x', renderTest(tile, style, 2));
+        t.test(tile.join('-') + '@2x', renderTest(tile, style, 2));
     });
     t.end();
 });
