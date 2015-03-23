@@ -53,9 +53,12 @@ GL.prototype.getTile = function(z, x, y, callback) {
     // as attributes of the callback function.
     var scale = callback.scale || 1;
 
-    var bbox = sm.bbox(+x,+y,+z, false, 'WGS84');
+    var bbox = sm.bbox(+x,+y,+z, false, '900913');
+    var center = sm.inverse([bbox[0] + ((bbox[2] - bbox[0]) * 0.5), bbox[1] + ((bbox[3] - bbox[1]) * 0.5)]);
+
     var options = {
-        center: [bbox[1] + ((bbox[3] - bbox[1]) * 0.5), bbox[0] + ((bbox[2] - bbox[0]) * 0.5)],
+        // pass center in lat, lng order
+        center: [center[1], center[0]],
         width: 512,
         height: 512,
         ratio: scale || 1,
