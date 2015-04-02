@@ -6,6 +6,7 @@ var Pool = require('generic-pool').Pool;
 var N_CPUS = require('os').cpus().length;
 
 module.exports = GL;
+module.exports.mbgl = mbgl;
 
 mbgl.on('message', function(msg) {
     console.log(msg.severity, '[' + msg.class + ']', msg.text);
@@ -21,7 +22,7 @@ function GL(options, callback) {
     if (typeof options.style !== 'object') return callback(new Error('options.style must be a GL style object'));
     this._style = options.style;
 
-    this._accessToken = options.accessToken || process.env.MAPBOX_ACCESS_TOKEN;
+    this._accessToken = options.accessToken;
 
     this._pool = pool(options.source, this._style, this._accessToken);
 
