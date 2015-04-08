@@ -15,6 +15,7 @@ fileSource.request = function(req) {
         if (req.canceled) {
             return;
         }
+
         if (err) {
             req.respond(err);
         } else if (res.statusCode == 200) {
@@ -26,7 +27,7 @@ fileSource.request = function(req) {
             response.data = body;
             req.respond(null, response);
         } else {
-            console.warn(new Date(res.headers.expires));
+            req.respond(new Error(JSON.parse(body).message));
         }
     });
 };
