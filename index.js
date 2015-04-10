@@ -6,9 +6,9 @@ var Pool = require('generic-pool').Pool;
 var N_CPUS = require('os').cpus().length;
 
 module.exports = function(fileSource) {
-    if (!(fileSource instanceof mbgl.FileSource)) return callback(new Error('fileSource must be a FileSource object'));
-    if (typeof fileSource.request !== 'function') return callback(new Error("fileSource must have a 'request' method"));
-    if (typeof fileSource.cancel !== 'function') return callback(new Error("fileSource must have a 'cancel' method"));
+    if (!(fileSource instanceof mbgl.FileSource)) throw new Error('fileSource must be a FileSource object');
+    if (typeof fileSource.request !== 'function') throw new Error("fileSource must have a 'request' method");
+    if (typeof fileSource.cancel !== 'function') throw new Error("fileSource must have a 'cancel' method");
 
     GL.prototype._pool = pool(fileSource);
 
