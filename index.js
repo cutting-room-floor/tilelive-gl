@@ -5,31 +5,31 @@ var mbgl = require('mapbox-gl-native');
 var Pool = require('generic-pool').Pool;
 var N_CPUS = require('os').cpus().length;
 
-module.exports = GL;
-module.exports.mbgl = mbgl;
+module.exports = function(fileSource) {
+    if (!(fileSource instanceof mbgl.FileSource)) throw new Error('fileSource must be a FileSource object');
+    if (typeof fileSource.request !== 'function') throw new Error("fileSource must have a 'request' method");
+    if (typeof fileSource.cancel !== 'function') throw new Error("fileSource must have a 'cancel' method");
 
-mbgl.on('message', function(msg) {
-    console.log(msg.severity, '[' + msg.class + ']', msg.text);
-});
+    GL.prototype._pool = pool(fileSource);
+
+    return GL;
+};
+
+module.exports.mbgl = mbgl;
 
 function GL(options, callback) {
     if (typeof options !== 'object' || !options) return callback(new Error('options must be an object'));
 
-    if (!(options.source instanceof mbgl.FileSource)) return callback(new Error('options.source must be a FileSource object'));
-    if (typeof options.source.request !== 'function') return callback(new Error("options.source must have a 'request' method"));
-    if (typeof options.source.cancel !== 'function') return callback(new Error("options.source must have a 'cancel' method"));
-
     if (typeof options.style !== 'object') return callback(new Error('options.style must be a GL style object'));
     this._style = options.style;
 
+    if (typeof options.accessToken !== 'string') return callback(new Error('options.accessToken must be a string'));
     this._accessToken = options.accessToken;
-
-    this._pool = pool(options.source, this._style, this._accessToken);
 
     return callback(null, this);
 }
 
-function pool(source, style, accessToken) {
+function pool(fileSource) {
     return Pool({
         create: create,
         destroy: destroy,
@@ -37,9 +37,7 @@ function pool(source, style, accessToken) {
     });
 
     function create(callback) {
-        var map = new mbgl.Map(source);
-        if (accessToken) map.setAccessToken(accessToken)
-        map.load(style);
+        var map = new mbgl.Map(fileSource);
         return callback(null, map);
     }
 
@@ -68,6 +66,9 @@ GL.prototype.getTile = function(z, x, y, callback) {
 
     this._pool.acquire(function(err, map) {
         if (err) return callback(err);
+
+        map.setAccessToken(this._accessToken)
+        map.load(this._style);
 
         map.render(options, function(err, buffer) {
             if (err) return callback(err);
