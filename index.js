@@ -2,20 +2,25 @@ var sm = new (require('sphericalmercator'))();
 var fs = require('fs');
 var mbgl = require('mapbox-gl-native');
 
-module.exports = GL;
+module.exports = function(fileSource) {
+    if (!(fileSource instanceof mbgl.FileSource)) throw new Error('fileSource must be a FileSource object');
+    if (typeof fileSource.request !== 'function') throw new Error("fileSource must have a 'request' method");
+    if (typeof fileSource.cancel !== 'function') throw new Error("fileSource must have a 'cancel' method");
+
+    GL.prototype._fileSource = fileSource;
+
+    return GL;
+};
+
 module.exports.mbgl = mbgl;
 
 function GL(options, callback) {
     if (typeof options !== 'object' || !options) return callback(new Error('options must be an object'));
 
-    if (!(options.source instanceof mbgl.FileSource)) return callback(new Error('options.source must be a FileSource object'));
-    if (typeof options.source.request !== 'function') return callback(new Error("options.source must have a 'request' method"));
-    if (typeof options.source.cancel !== 'function') return callback(new Error("options.source must have a 'cancel' method"));
-    this._source = options.source;
-
     if (typeof options.style !== 'object') return callback(new Error('options.style must be a GL style object'));
     this._style = options.style;
 
+    if (typeof options.accessToken !== 'string') return callback(new Error('options.accessToken must be a string'));
     this._accessToken = options.accessToken;
 
     return callback(null, this);
