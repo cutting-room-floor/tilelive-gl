@@ -8,10 +8,6 @@ var N_CPUS = require('os').cpus().length;
 module.exports = GL;
 module.exports.mbgl = mbgl;
 
-mbgl.on('message', function(msg) {
-    console.log(msg.severity, '[' + msg.class + ']', msg.text);
-});
-
 function GL(options, callback) {
     if (typeof options !== 'object' || !options) return callback(new Error('options must be an object'));
 
@@ -62,7 +58,7 @@ GL.prototype.getTile = function(z, x, y, callback) {
         center: [center[1], center[0]],
         width: 512,
         height: 512,
-        ratio: scale || 1,
+        ratio: scale,
         zoom: z
     };
 
