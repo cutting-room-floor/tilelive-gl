@@ -4,8 +4,8 @@
 
 var TileSource = require('..');
 var test = require('tape').test;
-var mbgl = require('mapbox-gl-native');
-var style = require('./fixtures/style.json');
+var tilelive = require('tilelive');
+var mbgl = TileSource.mbgl;
 
 // These calls are all effectively synchronous though they use a callback.
 test('TileSource', function(t) {
@@ -42,23 +42,25 @@ test('TileSource', function(t) {
 
 test('GL', function(t) {
     var fileSource = new mbgl.FileSource();
-    fileSource.request = function() {};
+    fileSource.request = function(req) {
+        req.respond(null, { data: new Buffer(0) });
+    };
     fileSource.cancel = function() {};
 
     var GL = TileSource(fileSource);
 
     t.test('options', function(t) {
-        t.test('must be an object', function(t) {
+        t.test('must be an object or a string', function(t) {
             new GL(null, function(err) {
-                t.equal(err.toString(), 'Error: options must be an object');
+                t.equal(err.toString(), 'Error: options must be an object or a string');
                 t.end();
             });
         });
 
-        // @TODO support filepath loading in the future?
         t.test('gl protocol style path', function(t) {
-            new GL('gl:///test-style.json', function(err) {
-                t.equal(err.toString(), 'Error: options must be an object');
+            GL.registerProtocols(tilelive);
+            tilelive.load('gl://' +  __dirname + '/fixtures/style.json', function(err, map) {
+                t.error(err);
                 t.end();
             });
         });
@@ -66,7 +68,7 @@ test('GL', function(t) {
         t.end();
     });
 
-    t.test('style', function(t) {
+    t.skip('style', function(t) {
         t.test('must be a GL style object', function(t) {
             new GL({}, function(err) {
                 t.equal(err.toString(), 'Error: options.style must be a GL style object');

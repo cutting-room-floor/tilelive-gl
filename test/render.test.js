@@ -47,7 +47,7 @@ test('Render', function(t) {
                             });
                         });
                     }
-                }
+                };
 
                 if (scale) callback.scale = scale;
 

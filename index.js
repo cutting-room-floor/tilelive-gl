@@ -15,14 +15,26 @@ module.exports = function(fileSource) {
 module.exports.mbgl = mbgl;
 
 function GL(options, callback) {
-    if (typeof options !== 'object' || !options) return callback(new Error('options must be an object'));
+    if ((typeof options !== 'object' && typeof options !== 'string') || !options) return callback(new Error('options must be an object or a string'));
 
-    if (typeof options.style !== 'object') return callback(new Error('options.style must be a GL style object'));
     this._map = new mbgl.Map(this._fileSource);
-    this._map.load(options.style);
+
+    if (options.protocol && options.protocol === 'gl:') {
+        style = JSON.parse(fs.readFileSync(options.path));
+    } else if (typeof options.style === 'object') {
+        style = options.style;
+    } else {
+        return callback(new Error('options.style must be a GL style object'));
+    }
+
+    this._map.load(style);
 
     return callback(null, this);
 }
+
+GL.registerProtocols = function(tilelive) {
+    tilelive.protocols['gl:'] = GL;
+};
 
 GL.prototype.getTile = function(z, x, y, callback) {
 
