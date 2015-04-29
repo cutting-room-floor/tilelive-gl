@@ -2,9 +2,6 @@ var sm = new (require('sphericalmercator'))();
 var fs = require('fs');
 var mbgl = require('mapbox-gl-native');
 
-var Pool = require('generic-pool').Pool;
-var N_CPUS = require('os').cpus().length;
-
 module.exports = GL;
 module.exports.mbgl = mbgl;
 
@@ -14,35 +11,15 @@ function GL(options, callback) {
     if (!(options.source instanceof mbgl.FileSource)) return callback(new Error('options.source must be a FileSource object'));
     if (typeof options.source.request !== 'function') return callback(new Error("options.source must have a 'request' method"));
     if (typeof options.source.cancel !== 'function') return callback(new Error("options.source must have a 'cancel' method"));
+    this._source = options.source;
 
     if (typeof options.style !== 'object') return callback(new Error('options.style must be a GL style object'));
     this._style = options.style;
 
     this._accessToken = options.accessToken;
 
-    this._pool = pool(options.source, this._style, this._accessToken);
-
     return callback(null, this);
 }
-
-function pool(source, style, accessToken) {
-    return Pool({
-        create: create,
-        destroy: destroy,
-        max: N_CPUS
-    });
-
-    function create(callback) {
-        var map = new mbgl.Map(source);
-        if (accessToken) map.setAccessToken(accessToken)
-        map.load(style);
-        return callback(null, map);
-    }
-
-    function destroy(map) {
-    }
-}
-
 
 GL.prototype.getTile = function(z, x, y, callback) {
 
@@ -62,16 +39,15 @@ GL.prototype.getTile = function(z, x, y, callback) {
         zoom: z
     };
 
-    this._pool.acquire(function(err, map) {
-        if (err) return callback(err);
+    var map = new mbgl.Map(this._source);
+    map.setAccessToken(this._accessToken)
+    map.load(this._style);
 
-        map.render(options, function(err, buffer) {
+    map.render(options, function(err, buffer) {
+        if (err) return callback(err);
+        mbgl.compressPNG(buffer, function(err, image) {
             if (err) return callback(err);
-            mbgl.compressPNG(buffer, function(err, image) {
-                if (err) return callback(err);
-                this._pool.release(map);
-                return callback(null, image, { 'Content-Type': 'image/png' });
-            }.bind(this));
-        }.bind(this));
-    }.bind(this));
+            return callback(null, image, { 'Content-Type': 'image/png' });
+        });
+    });
 };
