@@ -18,10 +18,8 @@ function GL(options, callback) {
     if (typeof options !== 'object' || !options) return callback(new Error('options must be an object'));
 
     if (typeof options.style !== 'object') return callback(new Error('options.style must be a GL style object'));
-    this._style = options.style;
-
-    if (typeof options.accessToken !== 'string') return callback(new Error('options.accessToken must be a string'));
-    this._accessToken = options.accessToken;
+    this._map = new mbgl.Map(this._fileSource);
+    this._map.load(options.style);
 
     return callback(null, this);
 }
@@ -44,12 +42,12 @@ GL.prototype.getTile = function(z, x, y, callback) {
         zoom: z
     };
 
-    var map = new mbgl.Map(this._source);
-    map.setAccessToken(this._accessToken)
-    map.load(this._style);
+    if (typeof callback.accessToken !== 'string') return callback(new Error('callback.accessToken must be a string'));
+    this._map.setAccessToken(callback.accessToken);
 
-    map.render(options, function(err, buffer) {
+    this._map.render(options, function(err, buffer) {
         if (err) return callback(err);
+
         mbgl.compressPNG(buffer, function(err, image) {
             if (err) return callback(err);
             return callback(null, image, { 'Content-Type': 'image/png' });

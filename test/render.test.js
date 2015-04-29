@@ -28,7 +28,7 @@ test('Render', function(t) {
 
     function renderTest(tile, style, scale) {
         return function(t) {
-            new GL({ style: style, accessToken: 'pk.test' }, function(err, source) {
+            new GL({ style: style }, function(err, source) {
                 t.error(err);
 
                 var callback = function(err, image) {
@@ -42,7 +42,7 @@ test('Render', function(t) {
                     } else {
                         fs.writeFile(filename.actual, image, function(err) {
                             compare(filename.actual, filename.expected, filename.diff, t, function(error, difference) {
-                                t.skip(difference <= 0.01, 'actual matches expected');
+                                t.ok(difference <= 0.01, 'actual matches expected');
                                 t.end();
                             });
                         });
@@ -50,6 +50,8 @@ test('Render', function(t) {
                 }
 
                 if (scale) callback.scale = scale;
+
+                callback.accessToken = 'pk.test';
 
                 var z = tile[0];
                 var x = tile[1];

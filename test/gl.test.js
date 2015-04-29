@@ -9,7 +9,7 @@ var style = require('./fixtures/style.json');
 
 // These calls are all effectively synchronous though they use a callback.
 test('TileSource', function(t) {
-    t.test('source', function(t) {
+    t.test('fileSource', function(t) {
         t.test('must be a FileSource object', function(t) {
             t.throws(function() {
                 TileSource({});
@@ -77,25 +77,41 @@ test('GL', function(t) {
         t.end();
     });
 
+    t.test('new GL', function(t) {
+        new GL({ style: {} }, function(err, map) {
+            t.error(err);
+            t.equal(map instanceof GL, true, 'instanceof GL');
+            t.end();
+        });
+    });
+
     t.test('access token', function(t) {
         t.test('must be a string', function(t) {
-            new GL({ style: {} }, function(err, source) {
-                t.equal(err.toString(), 'Error: options.accessToken must be a string');
-                t.end();
+            new GL({ style: {} }, function(err, map) {
+                map.getTile(0, 0, 0, function(err, image) {
+                    t.equal(err.toString(), 'Error: callback.accessToken must be a string');
+                    t.end();
+                });
             });
         });
 
         t.end();
     });
 
-    t.test('success', function(t) {
-        new GL({ style: {}, accessToken: 'pk.test' }, function(err, source) {
-            t.ifError(err);
-            t.equal(source instanceof GL, true, 'instanceof GL');
-            t.skip(source._style, style, 'source._style matches style');
-            t.equal(source._accessToken, 'pk.test', 'source._accessToken matches accessToken');
+    t.test('getTile', function(t) {
 
-            t.end();
+        new GL({ style: {} }, function(err, map) {
+            t.error(err);
+            t.equal(map instanceof GL, true, 'instanceof GL');
+
+            var callback = function(err, image) {
+                t.error(err);
+                t.end();
+            };
+
+            callback.accessToken = 'pk.test';
+
+            map.getTile(0, 0, 0, callback);
         });
     });
 
