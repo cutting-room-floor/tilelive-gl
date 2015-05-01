@@ -57,21 +57,17 @@ test('GL', function(t) {
             });
         });
 
-        t.test('gl protocol style path', function(t) {
-            GL.registerProtocols(tilelive);
-            tilelive.load('gl://' +  __dirname + '/fixtures/style.json', function(err, map) {
-                t.error(err);
+        t.test('missing GL style JSON', function(t) {
+            new GL({}, function(err) {
+                t.equal(err.toString(), 'Error: Missing GL style JSON');
                 t.end();
             });
         });
 
-        t.end();
-    });
-
-    t.skip('style', function(t) {
-        t.test('must be a GL style object', function(t) {
-            new GL({}, function(err) {
-                t.equal(err.toString(), 'Error: options.style must be a GL style object');
+        t.test('gl protocol style path', function(t) {
+            GL.registerProtocols(tilelive);
+            tilelive.load('gl://' +  __dirname + '/fixtures/style.json', function(err, map) {
+                t.error(err);
                 t.end();
             });
         });

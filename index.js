@@ -1,5 +1,6 @@
 var sm = new (require('sphericalmercator'))();
 var fs = require('fs');
+var path = require('path');
 var mbgl = require('mapbox-gl-native');
 
 module.exports = function(fileSource) {
@@ -15,19 +16,32 @@ module.exports = function(fileSource) {
 module.exports.mbgl = mbgl;
 
 function GL(options, callback) {
-    if ((typeof options !== 'object' && typeof options !== 'string') || !options) return callback(new Error('options must be an object or a string'));
+    if (!options || (typeof options !== 'object' && typeof options !== 'string')) return callback(new Error('options must be an object or a string'));
 
-    this._map = new mbgl.Map(this._fileSource);
-
-    if (options.protocol && options.protocol === 'gl:') {
-        style = JSON.parse(fs.readFileSync(options.path));
-    } else if (typeof options.style === 'object') {
-        style = options.style;
-    } else {
-        return callback(new Error('options.style must be a GL style object'));
+    if (typeof options === 'string' || (options.protocol && !options.style)) {
+        options = typeof options === 'string' ? url.parse(options) : options;
+        var filepath = path.resolve(options.pathname);
+        fs.readFile(filepath, 'utf8', function(err, data) {
+            if (err) return callback(err);
+            try {
+                var json = JSON.parse(data);
+                new GL({
+                    style: json,
+                    base: path.dirname(filepath)
+                }, callback);
+            } catch(err) {
+                return callback(err);
+            }
+        });
+        return;
     }
 
-    this._map.load(style);
+    if (!options.style) return callback(new Error('Missing GL style JSON'));
+
+    this._base = path.resolve(options.base || __dirname);
+
+    this._map = new mbgl.Map(this._fileSource);
+    this._map.load(options.style);
 
     return callback(null, this);
 }
