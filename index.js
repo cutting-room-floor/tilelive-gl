@@ -23,15 +23,10 @@ function GL(options, callback) {
         var filepath = path.resolve(options.pathname);
         fs.readFile(filepath, 'utf8', function(err, data) {
             if (err) return callback(err);
-            try {
-                var json = JSON.parse(data);
-                new GL({
-                    style: json,
-                    base: path.dirname(filepath)
-                }, callback);
-            } catch(err) {
-                return callback(err);
-            }
+            new GL({
+                style: data,
+                base: path.dirname(filepath)
+            }, callback);
         });
         return;
     }
