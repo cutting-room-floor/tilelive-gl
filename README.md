@@ -28,7 +28,7 @@ new GL({ style: require('/path/to/file.json') }, function(err, source) {
 });
 ```
 
-## Prospective future API?
+## Tilelive.js API
 
 Though `tilelive` is not a dependency of `tilelive-gl` you will want to install it to actually make use of `tilelive-gl` through a reasonable API.
 
@@ -36,8 +36,8 @@ Though `tilelive` is not a dependency of `tilelive-gl` you will want to install 
 var tilelive = require('tilelive');
 require('tilelive-gl').registerProtocols(tilelive);
 
-tilelive.load('gl:///path/to/file.json', function(err, source) {
-    source.getTile(0, 0, 0, function(err, tile, headers) {
+tilelive.load('gl:///path/to/file.json', function(err, map) {
+    map.getTile(0, 0, 0, function(err, image) {
     });
 });
 ```

@@ -1,25 +1,49 @@
 var sm = new (require('sphericalmercator'))();
 var fs = require('fs');
+var path = require('path');
 var mbgl = require('mapbox-gl-native');
 
-module.exports = GL;
+module.exports = function(fileSource) {
+    if (!(fileSource instanceof mbgl.FileSource)) throw new Error('fileSource must be a FileSource object');
+    if (typeof fileSource.request !== 'function') throw new Error("fileSource must have a 'request' method");
+    if (typeof fileSource.cancel !== 'function') throw new Error("fileSource must have a 'cancel' method");
+
+    GL.prototype._fileSource = fileSource;
+
+    return GL;
+};
+
 module.exports.mbgl = mbgl;
 
 function GL(options, callback) {
-    if (typeof options !== 'object' || !options) return callback(new Error('options must be an object'));
+    if (!options || (typeof options !== 'object' && typeof options !== 'string')) return callback(new Error('options must be an object or a string'));
 
-    if (!(options.source instanceof mbgl.FileSource)) return callback(new Error('options.source must be a FileSource object'));
-    if (typeof options.source.request !== 'function') return callback(new Error("options.source must have a 'request' method"));
-    if (typeof options.source.cancel !== 'function') return callback(new Error("options.source must have a 'cancel' method"));
-    this._source = options.source;
+    if (typeof options === 'string' || (options.protocol && !options.style)) {
+        options = typeof options === 'string' ? url.parse(options) : options;
+        var filepath = path.resolve(options.pathname);
+        fs.readFile(filepath, 'utf8', function(err, data) {
+            if (err) return callback(err);
+            new GL({
+                style: data,
+                base: path.dirname(filepath)
+            }, callback);
+        });
+        return;
+    }
 
-    if (typeof options.style !== 'object') return callback(new Error('options.style must be a GL style object'));
-    this._style = options.style;
+    if (!options.style) return callback(new Error('Missing GL style JSON'));
 
-    this._accessToken = options.accessToken;
+    this._base = path.resolve(options.base || __dirname);
+
+    this._map = new mbgl.Map(this._fileSource);
+    this._map.load(options.style);
 
     return callback(null, this);
 }
+
+GL.registerProtocols = function(tilelive) {
+    tilelive.protocols['gl:'] = GL;
+};
 
 GL.prototype.getTile = function(z, x, y, callback) {
 
@@ -39,12 +63,12 @@ GL.prototype.getTile = function(z, x, y, callback) {
         zoom: z
     };
 
-    var map = new mbgl.Map(this._source);
-    map.setAccessToken(this._accessToken)
-    map.load(this._style);
+    if (typeof callback.accessToken !== 'string') return callback(new Error('callback.accessToken must be a string'));
+    this._map.setAccessToken(callback.accessToken);
 
-    map.render(options, function(err, buffer) {
+    this._map.render(options, function(err, buffer) {
         if (err) return callback(err);
+
         mbgl.compressPNG(buffer, function(err, image) {
             if (err) return callback(err);
             return callback(null, image, { 'Content-Type': 'image/png' });
