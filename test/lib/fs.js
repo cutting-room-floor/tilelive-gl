@@ -6,7 +6,7 @@ var mbgl = require('mapbox-gl-native');
 var fs = require('fs');
 var path = require('path');
 
-var base = path.join(__dirname, '../..');
+var base = path.join(__dirname, '..');
 
 var fileSource = new mbgl.FileSource();
 fileSource.request = function(req) {

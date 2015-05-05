@@ -10,12 +10,17 @@ var http = require('http');
 var st = require('st');
 var mkdirp = require('mkdirp');
 var compare = require('./compare.js')
-var tiles = path.join('test', 'fixtures', 'tiles');
-var fileSource = require('./fixtures/filesource/fs');
+var tiles = ['0-0-0', '1-0-1', '2-1-1', '3-2-3', '4-4-6'];
+var fileSource = require('./lib/fs');
 var style = require('./fixtures/style.json');
 
 test('Render', function(t) {
     var GL = TileSource(fileSource);
+    var mbgl = TileSource.mbgl;
+
+    mbgl.on('message', function(msg) {
+        console.log(msg);
+    });
 
     function filePath(name) {
         return ['expected', 'actual', 'diff'].reduce(function(prev, key) {
@@ -32,8 +37,13 @@ test('Render', function(t) {
                 t.error(err);
 
                 var callback = function(err, image) {
-                    t.error(err);
+                    if (err) {
+                        t.error(err);
+                        return t.end();
+                    }
+
                     var filename = filePath(tile.join('-') + (scale ? '@' + scale + 'x' : '') + '.png');
+
                     if (process.env.UPDATE) {
                         fs.writeFile(filename.expected, image, function(err) {
                             t.error(err);
@@ -62,10 +72,10 @@ test('Render', function(t) {
         }
     }
 
-    fs.readdirSync(tiles).forEach(function(filename) {
-        var tile = filename.split('.')[0].split('-');
-        t.test(tile.join('-'), renderTest(tile, style));
-        t.test(tile.join('-') + '@2x', renderTest(tile, style, 2));
+
+    tiles.forEach(function(tile) {
+        t.test(tile, renderTest(tile.split('-'), style));
+        t.test(tile + '@2x', renderTest(tile.split('-'), style, 2));
     });
 
     t.end();
