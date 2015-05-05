@@ -4,33 +4,32 @@ Renderer backend for [tilelive.js](http://github.com/mapbox/tilelive.js) that us
 
 [![Build Status](https://secure.travis-ci.org/mapbox/tilelive-gl.png)](http://travis-ci.org/mapbox/tilelive-gl)
 
+## new GL(options, callback)
 
-## Installation
-
-First, [install](https://github.com/mapbox/mapbox-gl-native/tree/cli-render-disable-assert#build-instructions) the [`cli-render-disable-assert`](https://github.com/mapbox/mapbox-gl-native/tree/cli-render-disable-assert) branch of `mapbox-gl-native` and [set an access token](https://github.com/mapbox/mapbox-gl-native/tree/cli-render-disable-assert#mapbox-api-access-tokens).
-
-Next, [install](https://github.com/mapbox/node-mapbox-gl-native/tree/cli-render#installing) the [`cli-render`](https://github.com/mapbox/node-mapbox-gl-native/tree/cli-render) branch of `node-mapbox-gl-native` and finally `npm install mapbox/tilelive-gl`.
+- *style*: a Mapbox GL style string or object that will be used to render vector tiles.
+- *base*: Optional, basepath for style. Defaults to `__dirname`.
+- *scale*: Optional, scale factor. Defaults to `1`.
 
 ## Usage
 
 ```javascript
 var GL = require('tilelive-gl');
 
-new GL({ style: require('/path/to/file.json') }, function(err, source) {
+new GL({ style: require('/path/to/file.json') }, function(err, map) {
     if (err) throw err;
 
     // Interface is in XYZ/Google coordinates.
     // Use `y = (1 << z) - 1 - y` to flip TMS coordinates.
-    source.getTile(0, 0, 0, function(err, tile) {
+    map.getTile(0, 0, 0, function(err, image) {
         // `err` is an error object when generation failed, otherwise null.
-        // `tile` contains the compressed image file as a Buffer
+        // `image` contains the compressed image file as a Buffer
     });
 });
 ```
 
-## Tilelive.js API
+## Tilelive API
 
-Though `tilelive` is not a dependency of `tilelive-gl` you will want to install it to actually make use of `tilelive-gl` through a reasonable API.
+Though `tilelive` is not a dependency of `tilelive-gl` you will want to install it to actually make use of `tilelive-gl` through the [tilelive API](https://github.com/mapbox/tilelive.js/blob/master/API.md).
 
 ```javascript
 var tilelive = require('tilelive');

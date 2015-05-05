@@ -34,6 +34,7 @@ function GL(options, callback) {
     if (!options.style) return callback(new Error('Missing GL style JSON'));
 
     this._base = path.resolve(options.base || __dirname);
+    this._scale = options.scale || 1;
 
     this._map = new mbgl.Map(this._fileSource);
     this._map.load(options.style);
@@ -49,7 +50,7 @@ GL.prototype.getTile = function(z, x, y, callback) {
 
     // Hack around tilelive API - allow params to be passed per request
     // as attributes of the callback function.
-    var scale = callback.scale || 1;
+    var scale = callback.scale || this._scale;
 
     var bbox = sm.bbox(+x,+y,+z, false, '900913');
     var center = sm.inverse([bbox[0] + ((bbox[2] - bbox[0]) * 0.5), bbox[1] + ((bbox[3] - bbox[1]) * 0.5)]);
