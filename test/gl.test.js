@@ -97,7 +97,6 @@ test('GL', function(t) {
     });
 
     t.test('getTile', function(t) {
-
         new GL({ style: {} }, function(err, map) {
             t.error(err);
             t.equal(map instanceof GL, true, 'instanceof GL');

@@ -2,6 +2,9 @@ var sm = new (require('sphericalmercator'))();
 var fs = require('fs');
 var path = require('path');
 var mbgl = require('mapbox-gl-native');
+var PNG = require('pngjs').PNG;
+var stream = require('stream');
+var concat = require('concat-stream');
 
 module.exports = function(fileSource) {
     if (!(fileSource instanceof mbgl.FileSource)) throw new Error('fileSource must be a FileSource object');
@@ -67,12 +70,20 @@ GL.prototype.getTile = function(z, x, y, callback) {
     if (typeof callback.accessToken !== 'string') return callback(new Error('callback.accessToken must be a string'));
     this._map.setAccessToken(callback.accessToken);
 
-    this._map.render(options, function(err, buffer) {
+    this._map.render(options, function(err, data) {
         if (err) return callback(err);
 
-        mbgl.compressPNG(buffer, function(err, image) {
-            if (err) return callback(err);
-            return callback(null, image, { 'Content-Type': 'image/png' });
+        var png = new PNG({
+            width: data.width,
+            height: data.height
         });
+
+        png.data = data.pixels;
+
+        var concatStream = concat(function(buffer) {
+            return callback(null, buffer, { 'Content-Type': 'image/png' });
+        });
+         
+        png.pack().pipe(concatStream);
     });
 };

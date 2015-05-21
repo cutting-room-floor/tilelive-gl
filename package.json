@@ -9,8 +9,10 @@
   },
   "licenses": "BSD",
   "dependencies": {
+    "concat-stream": "^1.4.8",
     "generic-pool": "^2.1.1",
     "mapbox-gl-native": "^1.0.3",
+    "pngjs": "^0.4.0",
     "request": "^2.53.0",
     "sphericalmercator": "^1.0.2"
   },
