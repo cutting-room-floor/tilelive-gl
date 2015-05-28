@@ -67,9 +67,6 @@ GL.prototype.getTile = function(z, x, y, callback) {
         zoom: z
     };
 
-    if (typeof callback.accessToken !== 'string') return callback(new Error('callback.accessToken must be a string'));
-    this._map.setAccessToken(callback.accessToken);
-
     this._map.render(options, function(err, data) {
         if (err) return callback(err);
 

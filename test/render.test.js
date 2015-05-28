@@ -61,8 +61,6 @@ test('Render', function(t) {
 
                 if (scale) callback.scale = scale;
 
-                callback.accessToken = 'pk.test';
-
                 var z = tile[0];
                 var x = tile[1];
                 var y = tile[2];

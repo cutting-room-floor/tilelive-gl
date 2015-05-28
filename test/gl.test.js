@@ -83,19 +83,6 @@ test('GL', function(t) {
         });
     });
 
-    t.test('access token', function(t) {
-        t.test('must be a string', function(t) {
-            new GL({ style: {} }, function(err, map) {
-                map.getTile(0, 0, 0, function(err, image) {
-                    t.equal(err.toString(), 'Error: callback.accessToken must be a string');
-                    t.end();
-                });
-            });
-        });
-
-        t.end();
-    });
-
     t.test('getTile', function(t) {
         new GL({ style: {} }, function(err, map) {
             t.error(err);
@@ -105,8 +92,6 @@ test('GL', function(t) {
                 t.error(err);
                 t.end();
             };
-
-            callback.accessToken = 'pk.test';
 
             map.getTile(0, 0, 0, callback);
         });
