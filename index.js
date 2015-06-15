@@ -36,7 +36,6 @@ function GL(options, callback) {
 
     if (!options.style) return callback(new Error('Missing GL style JSON'));
 
-    this._base = path.resolve(options.base || __dirname);
     this._scale = options.scale || 1;
 
     this._map = new mbgl.Map(this._fileSource);
