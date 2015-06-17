@@ -2,6 +2,8 @@
 
 Renderer backend for [tilelive.js](http://github.com/mapbox/tilelive.js) that uses [node-mapbox-gl-native](http://github.com/mapbox/node-mapbox-gl-native) to render tiles from a [Mapbox GL style](https://www.mapbox.com/mapbox-gl-style-spec/).
 
+[![NPM](https://nodei.co/npm/tilelive-gl.png)](https://npmjs.org/package/tilelive-gl)
+
 [![Build Status](https://travis-ci.org/mapbox/tilelive-gl.svg?branch=master)](https://travis-ci.org/mapbox/tilelive-gl)
 
 ## new GL(options, callback)
