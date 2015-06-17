@@ -26,10 +26,7 @@ function GL(options, callback) {
         var filepath = path.resolve(options.pathname);
         fs.readFile(filepath, 'utf8', function(err, data) {
             if (err) return callback(err);
-            new GL({
-                style: data,
-                base: path.dirname(filepath)
-            }, callback);
+            new GL({ style: data }, callback);
         });
         return;
     }

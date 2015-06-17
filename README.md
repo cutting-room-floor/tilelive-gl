@@ -7,7 +7,6 @@ Renderer backend for [tilelive.js](http://github.com/mapbox/tilelive.js) that us
 ## new GL(options, callback)
 
 - *style*: a Mapbox GL style string or object that will be used to render vector tiles.
-- *base*: Optional, basepath for style. Defaults to `__dirname`.
 - *scale*: Optional, scale factor. Defaults to `1`.
 
 ## Usage
@@ -29,14 +28,13 @@ new GL({ style: require('/path/to/file.json') }, function(err, map) {
 
 ## Tilelive API
 
-Though `tilelive` is not a dependency of `tilelive-gl` you will want to install it to actually make use of `tilelive-gl` through the [tilelive API](https://github.com/mapbox/tilelive.js/blob/master/API.md).
+Though `tilelive` is not a dependency of `tilelive-gl` you will want to install it to make use of `tilelive-gl` through the [tilelive API](https://github.com/mapbox/tilelive.js/blob/master/API.md).
 
 ```javascript
 var tilelive = require('tilelive');
 require('tilelive-gl').registerProtocols(tilelive);
 
 tilelive.load('gl:///path/to/file.json', function(err, map) {
-    map.getTile(0, 0, 0, function(err, image) {
-    });
+    map.getTile(0, 0, 0, function(err, image) {});
 });
 ```
