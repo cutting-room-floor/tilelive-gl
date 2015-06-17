@@ -1,17 +1,19 @@
 language: node_js
 
+sudo: false
+
 node_js:
+- "iojs-v2.0.1"
+- "0.12.0"
 - "0.10"
 
-env:
-  global:
-  - LD_LIBRARY_PATH: "/usr/local/lib"
-  - MESA_VERSION: 10.4.3
+addons:
+  apt:
+    sources: [ 'ubuntu-toolchain-r-test' ]
+    packages: [ 'libstdc++6' ]
 
 before_install:
-# install c++11 capable libstdc++ without sudo
-- if [[ $(uname -s) == 'Linux' ]]; then wget https://launchpad.net/~ubuntu-toolchain-r/+archive/ubuntu/test/+files/libstdc%2B%2B6_4.8.1-2ubuntu1~12.04_amd64.deb && dpkg -x libstdc++6_4.8.1-2ubuntu1~12.04_amd64.deb ./ && export LD_PRELOAD=$(pwd)/usr/lib/x86_64-linux-gnu/libstdc++.so.6; fi
-- source ./scripts/install_mesa.sh
+- source ./scripts/start_xvfb.sh
 
 install:
 - npm install --fallback-to-build=false

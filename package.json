@@ -9,18 +9,17 @@
   },
   "licenses": "BSD",
   "dependencies": {
-    "concat-stream": "^1.4.8",
-    "generic-pool": "^2.1.1",
-    "mapbox-gl-native": "^1.0.3",
+    "concat-stream": "^1.5.0",
+    "mapbox-gl-native": "^1.1.1",
     "pngjs": "^0.4.0",
-    "request": "^2.53.0",
-    "sphericalmercator": "^1.0.2"
+    "sphericalmercator": "^1.0.3"
   },
   "devDependencies": {
-    "mkdirp": "^0.5.0",
-    "st": "^0.5.2",
-    "tape": "^3.0.3",
-    "tilelive": "^5.7.0"
+    "mkdirp": "^0.5.1",
+    "request": "^2.58.0",
+    "st": "^0.5.4",
+    "tape": "^4.0.0",
+    "tilelive": "^5.7.1"
   },
   "scripts": {
     "test": "tape test/*.test.js"
