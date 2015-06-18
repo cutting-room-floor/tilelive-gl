@@ -63,22 +63,7 @@ GL.prototype.getTile = function(z, x, y, callback) {
         zoom: z
     };
 
-    this._map.render(options, function(err, data) {
-        if (err) return callback(err);
-
-        var png = new PNG({
-            width: data.width,
-            height: data.height
-        });
-
-        png.data = data.pixels;
-
-        var concatStream = concat(function(buffer) {
-            return callback(null, buffer, { 'Content-Type': 'image/png' });
-        });
-
-        png.pack().pipe(concatStream);
-    });
+    this.getStatic(options, callback);
 };
 
 GL.prototype.getStatic = function(options, callback) {
