@@ -10,13 +10,6 @@ var mbgl = TileSource.mbgl;
 // These calls are all effectively synchronous though they use a callback.
 test('TileSource', function(t) {
     t.test('fileSource', function(t) {
-        t.test('must be a FileSource object', function(t) {
-            t.throws(function() {
-                TileSource({});
-            }, /fileSource must be a FileSource object/);
-            t.end();
-        });
-
         t.test('must have a request method', function(t) {
             var fileSource = new mbgl.FileSource();
 
@@ -60,14 +53,6 @@ test('GL', function(t) {
         t.test('missing GL style JSON', function(t) {
             new GL({}, function(err) {
                 t.equal(err.toString(), 'Error: Missing GL style JSON');
-                t.end();
-            });
-        });
-
-        t.test('gl protocol style path', function(t) {
-            GL.registerProtocols(tilelive);
-            tilelive.load('gl://' +  __dirname + '/fixtures/style.json', function(err, map) {
-                t.error(err);
                 t.end();
             });
         });
