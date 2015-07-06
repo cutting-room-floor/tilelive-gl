@@ -1,13 +1,10 @@
 var sm = new (require('sphericalmercator'))();
-var fs = require('fs');
-var path = require('path');
 var mbgl = require('mapbox-gl-native');
 var PNG = require('pngjs').PNG;
 var stream = require('stream');
 var concat = require('concat-stream');
 
 module.exports = function(fileSource) {
-    if (!(fileSource instanceof mbgl.FileSource)) throw new Error('fileSource must be a FileSource object');
     if (typeof fileSource.request !== 'function') throw new Error("fileSource must have a 'request' method");
     if (typeof fileSource.cancel !== 'function') throw new Error("fileSource must have a 'cancel' method");
 
@@ -20,17 +17,6 @@ module.exports.mbgl = mbgl;
 
 function GL(options, callback) {
     if (!options || (typeof options !== 'object' && typeof options !== 'string')) return callback(new Error('options must be an object or a string'));
-
-    if (typeof options === 'string' || (options.protocol && !options.style)) {
-        options = typeof options === 'string' ? url.parse(options) : options;
-        var filepath = path.resolve(options.pathname);
-        fs.readFile(filepath, 'utf8', function(err, data) {
-            if (err) return callback(err);
-            new GL({ style: data }, callback);
-        });
-        return;
-    }
-
     if (!options.style) return callback(new Error('Missing GL style JSON'));
 
     this._scale = options.scale || 1;
