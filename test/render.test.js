@@ -13,6 +13,7 @@ var compare = require('./compare.js')
 var tiles = ['0-0-0', '1-0-1', '2-1-1', '3-2-3', '4-4-6'];
 var fileSource = require('./lib/fs');
 var style = require('./fixtures/style.json');
+var queue = require('queue-async');
 
 test('Render', function(t) {
     var GL = TileSource(fileSource);
@@ -31,50 +32,49 @@ test('Render', function(t) {
         }, {});
     }
 
-    function renderTest(tile, style, scale) {
-        return function(t) {
-            new GL({ style: style }, function(err, source) {
-                t.error(err);
+    function renderTest(tile, style, scale, t, callback) {
+        new GL({ style: style }, function(err, source) {
+            t.error(err);
 
-                var callback = function(err, image) {
-                    if (err) {
+            var cb = function(err, image) {
+                if (err) {
+                    t.error(err);
+                    return callback(err);
+                }
+
+                var filename = filePath(tile.join('-') + (scale ? '@' + scale + 'x' : '') + '.png');
+                if (process.env.UPDATE) {
+                    fs.writeFile(filename.expected, image, function(err) {
                         t.error(err);
-                        return t.end();
-                    }
-
-                    var filename = filePath(tile.join('-') + (scale ? '@' + scale + 'x' : '') + '.png');
-
-                    if (process.env.UPDATE) {
-                        fs.writeFile(filename.expected, image, function(err) {
-                            t.error(err);
-                            t.end();
+                        return callback(err);
+                    });
+                } else {
+                    fs.writeFile(filename.actual, image, function(err) {
+                        compare(filename.actual, filename.expected, filename.diff, t, function(error, difference) {
+                            t.ok(difference <= 0.0, 'actual matches expected');
+                            return callback();
                         });
-                    } else {
-                        fs.writeFile(filename.actual, image, function(err) {
-                            compare(filename.actual, filename.expected, filename.diff, t, function(error, difference) {
-                                t.ok(difference <= 0.01, 'actual matches expected');
-                                t.end();
-                            });
-                        });
-                    }
-                };
+                    });
+                }
+            };
 
-                if (scale) callback.scale = scale;
 
-                var z = tile[0];
-                var x = tile[1];
-                var y = tile[2];
+            if (scale) cb.scale = scale;
 
-                source.getTile(z, x, y, callback);
-            });
-        }
+            var z = tile[0];
+            var x = tile[1];
+            var y = tile[2];
+
+            source.getTile(z, x, y, cb);
+        });
     }
 
-
+    var q = new queue();
     tiles.forEach(function(tile) {
-        t.test(tile, renderTest(tile.split('-'), style));
-        t.test(tile + '@2x', renderTest(tile.split('-'), style, 2));
+        q.defer(renderTest, tile.split('-'), style, 2, t);
+    });
+    q.awaitAll(function(err, res){
+        t.end();
     });
 
-    t.end();
 });
