@@ -17,4 +17,3 @@ module.exports = locking(function(params, callback) {
         return callback(null, map);
     });
 });
-
