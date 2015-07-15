@@ -13,7 +13,6 @@ var compare = require('./compare.js')
 var tiles = ['0-0-0', '1-0-1', '2-1-1', '3-2-3', '4-4-6'];
 var fileSource = require('./lib/fs');
 var style = require('./fixtures/style.json');
-var queue = require('queue-async');
 
 test('Render', function(t) {
     var GL = TileSource(fileSource);
@@ -47,12 +46,12 @@ test('Render', function(t) {
                     if (process.env.UPDATE) {
                         fs.writeFile(filename.expected, image, function(err) {
                             t.error(err);
-                            return callback(err);
+                            return callback();
                         });
                     } else {
                         fs.writeFile(filename.actual, image, function(err) {
                             compare(filename.actual, filename.expected, filename.diff, t, function(error, difference) {
-                                t.ok(difference <= 0.1, 'actual matches expected');
+                                t.ok(difference <= 0.01, 'actual matches expected');
                                 return callback();
                             });
                         });
