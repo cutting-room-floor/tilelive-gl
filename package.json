@@ -20,12 +20,14 @@
   ],
   "dependencies": {
     "concat-stream": "^1.5.0",
+    "generic-pool": "^2.2.0",
     "mapbox-gl-native": "^1.1.1",
     "pngjs": "^0.4.0",
     "sphericalmercator": "^1.0.3"
   },
   "devDependencies": {
     "mkdirp": "^0.5.1",
+    "queue-async": "^1.0.7",
     "request": "^2.58.0",
     "st": "^0.5.4",
     "tape": "^4.0.0",
