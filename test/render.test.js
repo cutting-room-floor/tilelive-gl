@@ -32,49 +32,44 @@ test('Render', function(t) {
         }, {});
     }
 
-    function renderTest(tile, style, scale, t, callback) {
+    function renderTest(style, scale, t) {
         new GL({ style: style }, function(err, source) {
             t.error(err);
 
-            var cb = function(err, image) {
-                if (err) {
-                    t.error(err);
-                    return callback(err);
-                }
-
-                var filename = filePath(tile.join('-') + (scale ? '@' + scale + 'x' : '') + '.png');
-                if (process.env.UPDATE) {
-                    fs.writeFile(filename.expected, image, function(err) {
+            tiles.forEach(function(tile) {
+                var cb = function(err, image) {
+                    if (err) {
                         t.error(err);
                         return callback(err);
-                    });
-                } else {
-                    fs.writeFile(filename.actual, image, function(err) {
-                        compare(filename.actual, filename.expected, filename.diff, t, function(error, difference) {
-                            t.ok(difference <= 0.0, 'actual matches expected');
-                            return callback();
+                    }
+
+                    var filename = filePath(tile.join('-') + (scale ? '@' + scale + 'x' : '') + '.png');
+                    if (process.env.UPDATE) {
+                        fs.writeFile(filename.expected, image, function(err) {
+                            t.error(err);
+                            return callback(err);
                         });
-                    });
-                }
-            };
+                    } else {
+                        fs.writeFile(filename.actual, image, function(err) {
+                            compare(filename.actual, filename.expected, filename.diff, t, function(error, difference) {
+                                t.ok(difference <= 0.1, 'actual matches expected');
+                                return callback();
+                            });
+                        });
+                    }
+                };
 
+                if (scale) cb.scale = scale;
 
-            if (scale) cb.scale = scale;
+                var z = tile[0];
+                var x = tile[1];
+                var y = tile[2];
 
-            var z = tile[0];
-            var x = tile[1];
-            var y = tile[2];
-
-            source.getTile(z, x, y, cb);
+                source.getTile(z, x, y, cb);
+            });
         });
     }
 
-    var q = new queue();
-    tiles.forEach(function(tile) {
-        q.defer(renderTest, tile.split('-'), style, 2, t);
-    });
-    q.awaitAll(function(err, res){
-        t.end();
-    });
+    renderTest(style, 2, t);
 
 });
