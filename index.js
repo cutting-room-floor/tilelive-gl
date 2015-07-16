@@ -4,7 +4,8 @@ var PNG = require('pngjs').PNG;
 var stream = require('stream');
 var concat = require('concat-stream');
 var Pool = require('generic-pool').Pool;
-var N_CPUS = require('os').cpus().length;
+// var N_CPUS = require('os').cpus().length;
+var N_CPUS = 1;
 
 function pool(style, fileSource) {
     return Pool({
@@ -71,11 +72,17 @@ GL.prototype.getTile = function(z, x, y, callback) {
 
 GL.prototype.getStatic = function(options, callback) {
     var that = this;
+    console.time('acquire');
     this._pool.acquire(function(err, map) {
+        console.timeEnd('acquire');
+
+        console.time('render');
         map.render(options, function(err, data) {
+            console.timeEnd('render');
 
             if (err) return callback(err);
 
+            console.time('png');
             var png = new PNG({
                 width: data.width,
                 height: data.height
@@ -84,6 +91,7 @@ GL.prototype.getStatic = function(options, callback) {
             png.data = data.pixels;
 
             var concatStream = concat(function(buffer) {
+                console.timeEnd('png')
                 return callback(null, buffer, { 'Content-Type': 'image/png' });
             });
 
