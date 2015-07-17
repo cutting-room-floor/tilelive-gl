@@ -21,7 +21,7 @@
   "dependencies": {
     "concat-stream": "^1.5.0",
     "generic-pool": "^2.2.0",
-    "mapbox-gl-native": "^1.1.1",
+    "mapbox-gl-native": "https://github.com/mapbox/node-mapbox-gl-native/tarball/native_png_encoder",
     "pngjs": "^0.4.0",
     "sphericalmercator": "^1.0.3"
   },
