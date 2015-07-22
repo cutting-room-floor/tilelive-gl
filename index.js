@@ -15,7 +15,7 @@ function pool(style, fileSource) {
 
     function create(callback) {
         var map = new mbgl.Map(fileSource);
-        var loaded = map.load(style);
+        map.load(style);
         return callback(null, map);
     }
 
