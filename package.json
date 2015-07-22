@@ -21,7 +21,7 @@
   "dependencies": {
     "concat-stream": "^1.5.0",
     "generic-pool": "^2.2.0",
-    "mapbox-gl-native": "^1.1.1",
+    "mapbox-gl-native": "^1.1.3",
     "pngjs": "^0.4.0",
     "sphericalmercator": "^1.0.3"
   },
