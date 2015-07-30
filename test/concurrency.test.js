@@ -7,7 +7,6 @@ var fileSource = require('./lib/fs');
 var GL = TileSource(fileSource);
 var test = require('tape').test;
 var locking = require('locking');
-var tile = { z: 0, x: 0, y: 0 };
 var style = require('./fixtures/style.json');
 
 TileSource.mbgl.on('message', function(msg) {
@@ -22,6 +21,8 @@ var loadMap = locking(function(key, callback) {
 });
 
 test('Concurrency', function(t) {
+    var tile = { z: 0, x: 0, y: 0 };
+
     for (var i = 0, j = 0; i < 10; i++) {
         loadMap('style', function(err, map) {
             t.error(err);

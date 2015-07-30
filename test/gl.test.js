@@ -46,6 +46,7 @@ test('GL', function(t) {
         t.test('must be an object or a string', function(t) {
             new GL(null, function(err) {
                 t.equal(err.toString(), 'Error: options must be an object or a string');
+
                 t.end();
             });
         });
@@ -64,7 +65,11 @@ test('GL', function(t) {
         new GL({ style: {} }, function(err, map) {
             t.error(err);
             t.equal(map instanceof GL, true, 'instanceof GL');
-            t.end();
+
+            map._pool.drain(function() {
+                map._pool.destroyAllNow();
+                t.end();
+            });
         });
     });
 
@@ -75,7 +80,11 @@ test('GL', function(t) {
 
             var callback = function(err, image) {
                 t.error(err);
-                t.end();
+
+                map._pool.drain(function() {
+                    map._pool.destroyAllNow();
+                    t.end();
+                });
             };
 
             map.getTile(0, 0, 0, callback);

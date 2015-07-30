@@ -20,6 +20,7 @@ function pool(style, fileSource) {
     }
 
     function destroy(map) {
+        map.release();
     }
 }
 
