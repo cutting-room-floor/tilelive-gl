@@ -6,7 +6,14 @@ var concat = require('concat-stream');
 var Pool = require('generic-pool').Pool;
 var N_CPUS = require('os').cpus().length;
 
-function pool(style, fileSource) {
+module.exports = GL;
+module.exports.mbgl = mbgl;
+
+function pool(options) {
+    var mapOptions = {};
+    mapOptions.request = options.request;
+    if (options.cancel) mapOptions.cancel = options.cancel;
+
     return Pool({
         create: create,
         destroy: destroy,
@@ -14,8 +21,8 @@ function pool(style, fileSource) {
     });
 
     function create(callback) {
-        var map = new mbgl.Map(fileSource);
-        map.load(style);
+        var map = new mbgl.Map(mapOptions);
+        map.load(options.style);
         return callback(null, map);
     }
 
@@ -24,23 +31,16 @@ function pool(style, fileSource) {
     }
 }
 
-module.exports = function(fileSource) {
-    if (typeof fileSource.request !== 'function') throw new Error("fileSource must have a 'request' method");
-    if (typeof fileSource.cancel !== 'function') throw new Error("fileSource must have a 'cancel' method");
-
-    GL.prototype._fileSource = fileSource;
-
-    return GL;
-};
-
-module.exports.mbgl = mbgl;
-
 function GL(options, callback) {
     if (!options || (typeof options !== 'object' && typeof options !== 'string')) return callback(new Error('options must be an object or a string'));
-    if (!options.style) return callback(new Error('Missing GL style JSON'));
+
+    if (!options.style) return callback(new Error("Options object must have a 'style' property"));
+
+    if (typeof options.request !== 'function') return callback(new Error("Options object must have a 'request' method"));
+    if (options.hasOwnProperty('cancel') && typeof options.cancel !== 'function') return callback(new Error("Options object 'cancel' property must be a function"));
 
     this._scale = options.scale || 1;
-    this._pool = pool(options.style, this._fileSource);
+    this._pool = pool(options);
 
     return callback(null, this);
 }
