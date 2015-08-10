@@ -10,9 +10,9 @@ module.exports = GL;
 module.exports.mbgl = mbgl;
 
 function pool(options) {
-    var mapOptions = {};
-    mapOptions.request = options.request;
-    if (options.cancel) mapOptions.cancel = options.cancel;
+    var fs = new mbgl.FileSource();
+    fs.request = options.request;
+    fs.cancel = options.cancel ? options.cancel : function() {};
 
     return Pool({
         create: create,
@@ -21,7 +21,7 @@ function pool(options) {
     });
 
     function create(callback) {
-        var map = new mbgl.Map(mapOptions);
+        var map = new mbgl.Map(fs);
         map.load(options.style);
         return callback(null, map);
     }
